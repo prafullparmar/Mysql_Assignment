@@ -1,0 +1,198 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Language`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Language` (
+  `LangID` INT NOT NULL,
+  `LangName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`LangID`),
+  UNIQUE INDEX `LangName_UNIQUE` (`LangName` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Genre`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Genre` (
+  `GenreId` INT NOT NULL,
+  `GenreName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`GenreId`),
+  UNIQUE INDEX `GenreName_UNIQUE` (`GenreName` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`FORMAT`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`FORMAT` (
+  `FORMATID` INT NOT NULL,
+  `FORMATName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`FORMATID`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Movie`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Movie` (
+  `MovieID` INT NOT NULL,
+  `MovieName` VARCHAR(45) NOT NULL,
+  `GenreID` INT NOT NULL,
+  `LanguageID` INT NOT NULL,
+  `FormatID` INT NOT NULL,
+  `ReleaseDate` DATE NULL,
+  `MovieRating` DECIMAL NULL,
+  PRIMARY KEY (`MovieID`),
+  INDEX `fk_Movie_Language1_idx` (`LanguageID` ASC) VISIBLE,
+  INDEX `fk_Movie_Genre1_idx` (`GenreID` ASC) VISIBLE,
+  INDEX `fk_Movie_FORMAT1_idx` (`FormatID` ASC) VISIBLE,
+  CONSTRAINT `fk_Movie_Language1`
+    FOREIGN KEY (`LanguageID`)
+    REFERENCES `mydb`.`Language` (`LangID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Movie_Genre1`
+    FOREIGN KEY (`GenreID`)
+    REFERENCES `mydb`.`Genre` (`GenreId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Movie_FORMAT1`
+    FOREIGN KEY (`FormatID`)
+    REFERENCES `mydb`.`FORMAT` (`FORMATID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Customer`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Customer` (
+  `CustID` INT NOT NULL,
+  `CustName` VARCHAR(45) NULL,
+  `Email` VARCHAR(45) NULL,
+  `MobileNo` BIGINT(10) NULL,
+  PRIMARY KEY (`CustID`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Theatre`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Theatre` (
+  `TheatreId` INT NOT NULL,
+  `TheatreName` VARCHAR(45) NULL,
+  `TheatreLocation` VARCHAR(60) NULL,
+  `TheatreScreens` INT NULL,
+  PRIMARY KEY (`TheatreId`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Screen`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Screen` (
+  `ScreenID` INT NOT NULL,
+  `TotalSeats` INT NULL,
+  `TheatreID` INT NOT NULL,
+  `ScreenName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`ScreenID`),
+  INDEX `fk_Screen_Theatre1_idx` (`TheatreID` ASC) VISIBLE,
+  CONSTRAINT `fk_Screen_Theatre1`
+    FOREIGN KEY (`TheatreID`)
+    REFERENCES `mydb`.`Theatre` (`TheatreId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`SHOWS`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`SHOWS` (
+  `ShowID` INT NOT NULL,
+  `ScreenID` INT NOT NULL,
+  `MovieID` INT NOT NULL,
+  `Price` INT NOT NULL,
+  `ShowTiming` DATETIME NULL,
+  `AvailableSeats` INT NOT NULL,
+  PRIMARY KEY (`ShowID`),
+  INDEX `fk_SHOW_Screen1_idx` (`ScreenID` ASC) VISIBLE,
+  INDEX `fk_SHOWS_Movie1_idx` (`MovieID` ASC) VISIBLE,
+  CONSTRAINT `fk_SHOW_Screen1`
+    FOREIGN KEY (`ScreenID`)
+    REFERENCES `mydb`.`Screen` (`ScreenID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_SHOWS_Movie1`
+    FOREIGN KEY (`MovieID`)
+    REFERENCES `mydb`.`Movie` (`MovieID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Ticket`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Ticket` (
+  `TicketID` INT NOT NULL AUTO_INCREMENT,
+  `CustID` INT NOT NULL,
+  `TicketCount` INT NULL,
+  `Price` VARCHAR(45) NULL,
+  `Status` VARCHAR(45) NULL,
+  `ShowID` INT NOT NULL,
+  INDEX `fk_Ticket_Customer1_idx` (`CustID` ASC) VISIBLE,
+  PRIMARY KEY (`TicketID`),
+  INDEX `fk_Ticket_SHOWS1_idx` (`ShowID` ASC) VISIBLE,
+  CONSTRAINT `fk_Ticket_Customer1`
+    FOREIGN KEY (`CustID`)
+    REFERENCES `mydb`.`Customer` (`CustID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Ticket_SHOWS1`
+    FOREIGN KEY (`ShowID`)
+    REFERENCES `mydb`.`SHOWS` (`ShowID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Employee`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Employee` (
+  `EmployeeID` INT NOT NULL,
+  `EmployeeName` VARCHAR(45) NULL,
+  `EmployeeEmail` VARCHAR(45) NULL,
+  `EmployeeMobile` INT(10) NULL,
+  `EmployeeAadhar` INT(15) NULL,
+  `TheatreID` INT NOT NULL,
+  PRIMARY KEY (`EmployeeID`),
+  INDEX `fk_Employee_Theatre1_idx` (`TheatreID` ASC) VISIBLE,
+  CONSTRAINT `fk_Employee_Theatre1`
+    FOREIGN KEY (`TheatreID`)
+    REFERENCES `mydb`.`Theatre` (`TheatreId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
